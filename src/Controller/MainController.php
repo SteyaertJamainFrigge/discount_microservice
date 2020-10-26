@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -36,7 +37,7 @@ class MainController extends AbstractController
         $product1 = new Product(1, "HydrogenDioxide (200g) ", 10.50);
         $product3 = new Product(3, "Silver (100g)", 2.60);
 
-        $shoppingCartData = $request->getContent();
+        $shoppingCartData = $this->getJson($request);
 
         try{
             /** @var Cart $cart */
@@ -55,7 +56,7 @@ class MainController extends AbstractController
             $cart = $discountCalculator->run();
             return new JsonResponse($serializer->serialize($cart, 'json'), Response::HTTP_OK);
         }catch (MissingConstructorArgumentsException $e){
-            return new JsonResponse("json data invalid", Response::HTTP_BAD_REQUEST);
+            return new JsonResponse("json invalid", Response::HTTP_BAD_REQUEST);
         }
 
     }
@@ -90,5 +91,23 @@ class MainController extends AbstractController
             $product3
         );
         return [$buyOneGetOneFree, $generalDiscount, $productSpecificDiscount];
+    }
+
+    /**
+     * Quick check if the data given by the request is really json data.
+     *
+     * @param Request $request
+     * @return resource|string
+     */
+    private function getJson(Request $request)
+    {
+
+        json_decode($request->getContent(), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new HttpException(400, 'Invalid json');
+        }
+
+        return $request->getContent();
     }
 }
