@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Entity;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -11,74 +13,54 @@
  *
  * @author frigg
  */
-class DiscountRule {
-    
-    /**
-     *
-     * @var int
-     */
-    private $id;
-    
-    /**
-     * if promotedProduct is not null, it will only apply to the given product.
-     * if promotedProduct is null, it applies to the shopping cart
-     * @var Product 
-     */
-    private $promotedProduct;
-    /**
-     *
-     * @var string
-     */
-    private $description;
+abstract class DiscountRule {
 
-    /**
-     *
-     * @var string
-     */
-    private $promotionCode;
-    
-    /**
-     *
-     * @var int
-     */
-    private $minimumAmount;
-    
-    /**
-     *
-     * @var float
-     */
-    private $discount;
-            
-    function __construct(int $id, Product $promotedProduct , string $description, string $promotionCode, int $minimumAmount, float $discount) {
+    protected int $id;
+
+    protected Product $promotedProduct;
+
+    protected array $cartItems;
+
+    protected string $description;
+
+    protected string $promotionCode;
+
+    protected int $minimumAmount;
+
+    protected float $discount;
+
+    public function __construct(int $id,
+                                string $description,
+                                string $promotionCode,
+                                int $minimumAmount,
+                                float $discount,
+                                array $cartItems,
+                                Product $promotedProduct = null) {
         $this->id = $id;
-        $this->promotedProduct = $promotedProduct;
         $this->description = $description;
         $this->promotionCode = $promotionCode;
         $this->minimumAmount = $minimumAmount;
         $this->discount = $discount;
+        $this->cartItems = $cartItems;
+        if($promotedProduct != null){
+            $this->promotedProduct = $promotedProduct;
+        }
     }
 
-    function getId(): int {
+    public function getId(): int {
         return $this->id;
     }
 
-    function getPromotedProduct(): Product {
-        return $this->promotedProduct;
-    }
-
-    function getDescription(): string {
+    public function getDescription(): string {
         return $this->description;
     }
 
-    function getPromotionCode(): string {
+    public function getPromotionCode(): string {
         return $this->promotionCode;
     }
 
-    function getMinimumAmount(): int {
-        return $this->minimumAmount;
-    }
+    abstract public function execute();
 
-    function getDiscount(): float {
-        return $this->discount;
-    }
+    abstract public function isValid(): bool;
+
 }

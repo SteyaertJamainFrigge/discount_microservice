@@ -1,10 +1,13 @@
 <?php
 
+namespace App\Entity;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+use JsonSerializable;
 
 /**
  * Description of Product
@@ -16,17 +19,17 @@ class Product {
     /**
      * @var int
      */
-    private $id;
+    private int $id;
     
     /**
      * @var string
      */
-    private $name;
+    private string $name;
     
     /**
      * @var float
      */
-    private $price;
+    private float $price;
     
     function __construct(int $id, string $name, float $price) {
         $this->id = $id;
